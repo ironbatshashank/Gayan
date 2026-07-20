@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Asian Flavours Hub — Checkout. Review your cart and place your order." />
+  <title>Checkout — Asian Flavours Hub</title>
+  <link rel="stylesheet" href="css/store.css" />
+  <style>
+    /* ============================================================
+       CHECKOUT PAGE SPECIFIC STYLES
+       ============================================================ */
+    body {
+      background: var(--dark);
+    }
+
+    .checkout-page {
+      min-height: calc(100vh - 72px - 100px);
+      padding: 60px 0 100px;
+    }
+
+    .checkout-page__header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .checkout-page__eyebrow {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .checkout-page__title {
+      font-family: var(--font-heading);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+
+    .checkout-page__sub {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1fr 440px;
+      gap: 2.5rem;
+      align-items: flex-start;
+    }
+
+    /* Left column: delivery form */
+    .checkout-form-col {
+      background: #111111;
+      border: 1px solid var(--dark-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .checkout-form-col__header {
+      padding: 1.5rem 2rem;
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--dark-border);
+    }
+
+    .checkout-form-col__header h2 {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .checkout-form-col__body {
+      padding: 2rem;
+    }
+
+    /* Right column: order summary */
+    .checkout-summary-col {
+      position: sticky;
+      top: 90px;
+    }
+
+    .checkout-summary-box {
+      background: #111111;
+      border: 1px solid var(--dark-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .checkout-summary-box__header {
+      padding: 1.25rem 1.5rem;
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--dark-border);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .checkout-summary-box__body {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .checkout-summary-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .checkout-summary-empty a {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .checkout-summary-empty a:hover {
+      text-decoration: underline;
+    }
+
+    .checkout-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color var(--transition);
+      margin-bottom: 2.5rem;
+    }
+
+    .checkout-back-link:hover {
+      color: var(--gold);
+    }
+
+    .checkout-totals {
+      border-top: 1px solid var(--dark-border);
+      padding-top: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .checkout-totals__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      margin-bottom: 0.55rem;
+      color: var(--text-muted);
+    }
+
+    .checkout-totals__row.total {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-top: 0.5rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--dark-border);
+      margin-bottom: 0;
+    }
+
+    .checkout-totals__row.total .amount {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      color: var(--gold);
+    }
+
+    .checkout-delivery-note {
+      background: rgba(212,160,23,0.05);
+      border: 1px solid rgba(212,160,23,0.15);
+      border-radius: var(--radius);
+      padding: 0.9rem 1.1rem;
+      font-size: 0.8rem;
+      color: rgba(212,160,23,0.75);
+      line-height: 1.6;
+      margin-top: 1rem;
+    }
+
+    /* Order Success Page State */
+    .checkout-success {
+      display: none;
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .checkout-success.active {
+      display: block;
+    }
+
+    .checkout-success__icon {
+      width: 90px;
+      height: 90px;
+      background: rgba(42,122,42,0.12);
+      border: 2px solid #2a7a2a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      font-size: 2.5rem;
+    }
+
+    .checkout-success__title {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+
+    .checkout-success__msg {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .checkout-success__actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-ghost {
+      background: none;
+      border: 2px solid var(--dark-border);
+      color: var(--text-muted);
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all var(--transition);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #0d0d0d;
+      border: 2px solid var(--gold);
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all var(--transition);
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-hover);
+      border-color: var(--gold-hover);
+      color: #0d0d0d;
+    }
+
+    @media (max-width: 900px) {
+      .checkout-layout {
+        grid-template-columns: 1fr;
+      }
+      .checkout-summary-col {
+        position: static;
+        order: -1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .checkout-page {
+        padding: 40px 0 70px;
+      }
+      .checkout-form-col__body {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       STORE NAVBAR
+       ============================================================ -->
+  <header class="store-nav" id="store-nav">
+    <a href="store.html" class="store-nav__brand" aria-label="Asian Flavours Hub">
+      <img
+        src="Food_logo.jpeg"
+        alt="Asian Flavours Hub logo"
+        class="store-nav__logo"
+        width="60"
+        height="60"
+      />
+      <div class="store-nav__name">
+        Asian Flavours Hub
+        <small>by FiscalUK</small>
+      </div>
+    </a>
+
+    <div class="store-nav__right">
+      <a href="store.html" class="back-link" aria-label="Continue shopping">
+        ← <span>Continue Shopping</span>
+      </a>
+      <button class="cart-btn" data-open-cart aria-label="View cart" aria-haspopup="dialog">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        Cart
+        <span class="cart-badge" id="cart-badge-nav" aria-live="polite">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       CART OVERLAY + DRAWER (for header cart button)
+       ============================================================ -->
+  <div class="cart-overlay" id="cart-overlay" aria-hidden="true"></div>
+
+  <aside class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <div class="cart-drawer__header">
+      <div class="cart-drawer__title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        Your Cart
+      </div>
+      <button class="cart-close" id="cart-close" aria-label="Close cart">✕</button>
+    </div>
+    <div class="cart-drawer__body" id="cart-body"></div>
+    <div class="cart-drawer__footer">
+      <div class="cart-subtotal">
+        <span class="cart-subtotal__label">Subtotal</span>
+        <span class="cart-subtotal__value" id="cart-subtotal">£0.00</span>
+      </div>
+      <p class="cart-note">Shipping calculated at checkout.</p>
+      <button class="btn-checkout" id="btn-checkout" disabled>Proceed to Checkout →</button>
+    </div>
+  </aside>
+
+  <main>
+
+    <section class="checkout-page">
+      <div class="container">
+
+        <!-- Success State -->
+        <div class="checkout-success" id="checkout-page-success">
+          <div class="checkout-success__icon">✓</div>
+          <h1 class="checkout-success__title">Order Placed!</h1>
+          <p class="checkout-success__msg">
+            Thank you! Your order has been received. We'll be in touch shortly at the email address you provided to confirm your order and arrange payment.
+          </p>
+          <div class="checkout-success__actions">
+            <a href="store.html" class="btn-gold">Continue Shopping</a>
+            <a href="index.html" class="btn-ghost">Return to FiscalUK</a>
+          </div>
+        </div>
+
+        <!-- Checkout Form State -->
+        <div id="checkout-page-content">
+          <a href="store.html" class="checkout-back-link">← Back to Store</a>
+
+          <div class="checkout-page__header">
+            <div class="checkout-page__eyebrow">Asian Flavours Hub</div>
+            <h1 class="checkout-page__title">Checkout</h1>
+            <p class="checkout-page__sub">Complete your delivery details below to place your order.</p>
+          </div>
+
+          <div class="checkout-layout">
+
+            <!-- LEFT: Delivery form -->
+            <div class="checkout-form-col">
+              <div class="checkout-form-col__header">
+                <h2>Delivery Details</h2>
+              </div>
+              <div class="checkout-form-col__body">
+                <form id="checkout-form" novalidate>
+
+                  <div class="checkout-form__section-title">Contact Information</div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="cf-name">Full Name <span class="required">*</span></label>
+                      <input type="text" id="cf-name" name="name" placeholder="Jane Smith" autocomplete="name" />
+                    </div>
+                    <div class="form-group">
+                      <label for="cf-email">Email Address <span class="required">*</span></label>
+                      <input type="email" id="cf-email" name="email" placeholder="jane@example.com" autocomplete="email" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="cf-phone">Phone Number</label>
+                    <input type="tel" id="cf-phone" name="phone" placeholder="+44 7700 900123" autocomplete="tel" />
+                  </div>
+
+                  <div class="checkout-form__section-title" style="margin-top: 1.5rem;">Shipping Address</div>
+
+                  <div class="form-group">
+                    <label for="cf-address1">Address Line 1 <span class="required">*</span></label>
+                    <input type="text" id="cf-address1" name="address1" placeholder="123 High Street" autocomplete="address-line1" />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="cf-address2">Address Line 2</label>
+                    <input type="text" id="cf-address2" name="address2" placeholder="Flat 4B (optional)" autocomplete="address-line2" />
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="cf-city">City <span class="required">*</span></label>
+                      <input type="text" id="cf-city" name="city" placeholder="London" autocomplete="address-level2" />
+                    </div>
+                    <div class="form-group">
+                      <label for="cf-postcode">Postcode <span class="required">*</span></label>
+                      <input type="text" id="cf-postcode" name="postcode" placeholder="SW1A 1AA" autocomplete="postal-code" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="cf-country">Country</label>
+                    <select id="cf-country" name="country" autocomplete="country">
+                      <option value="GB" selected>United Kingdom</option>
+                      <option value="IE">Ireland</option>
+                      <option value="FR">France</option>
+                      <option value="DE">Germany</option>
+                      <option value="ES">Spain</option>
+                      <option value="IT">Italy</option>
+                      <option value="NL">Netherlands</option>
+                      <option value="BE">Belgium</option>
+                      <option value="SE">Sweden</option>
+                      <option value="NO">Norway</option>
+                      <option value="AU">Australia</option>
+                      <option value="CA">Canada</option>
+                      <option value="US">United States</option>
+                    </select>
+                  </div>
+
+                  <div class="checkout-form__section-title" style="margin-top: 1.5rem;">Additional Information</div>
+
+                  <div class="form-group">
+                    <label for="cf-notes">Special Instructions</label>
+                    <textarea id="cf-notes" name="notes" placeholder="Allergies, delivery preferences, gift messages…"></textarea>
+                  </div>
+
+                  <div class="payment-note">
+                    <strong>Payment Gateway Coming Soon</strong>
+                    We'll contact you via email to arrange payment once your order is confirmed. Your details are safe with us.
+                  </div>
+
+                  <button type="button" class="btn-place-order" id="btn-place-order">
+                    Place Order
+                  </button>
+
+                </form>
+              </div>
+            </div>
+
+            <!-- RIGHT: Order summary -->
+            <div class="checkout-summary-col">
+              <div class="checkout-summary-box">
+                <div class="checkout-summary-box__header">Order Summary</div>
+                <div class="checkout-summary-box__body" id="page-order-summary">
+                  <div class="checkout-summary-empty">
+                    Your cart is empty. <a href="store.html">Browse our sauces →</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="checkout-delivery-note">
+                Free delivery on orders over £30. Standard UK delivery 3–5 working days. Express delivery available at checkout (coming soon).
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       STORE FOOTER
+       ============================================================ -->
+  <footer class="store-footer">
+    <div class="store-footer__inner">
+      <div class="store-footer__brand">Asian Flavours Hub</div>
+      <p class="store-footer__copy">&copy; 2025 Asian Flavours Hub by FiscalUK. All rights reserved.</p>
+      <a href="index.html" class="store-footer__link">← Return to FiscalUK Accounting</a>
+    </div>
+  </footer>
+
+  <script src="js/cart.js"></script>
+
+  <script>
+    /**
+     * Render the order summary on the checkout page itself (not in modal).
+     * This replaces cart.js's renderOrderSummary which targets modal IDs.
+     */
+    function renderPageOrderSummary() {
+      var cart = getCart();
+      var container = document.getElementById('page-order-summary');
+      if (!container) return;
+
+      if (cart.length === 0) {
+        container.innerHTML = '<div class="checkout-summary-empty">Your cart is empty. <a href="store.html">Browse our sauces →</a></div>';
+        var btn = document.getElementById('btn-place-order');
+        if (btn) {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+          btn.style.cursor = 'not-allowed';
+        }
+        return;
+      }
+
+      var total = getCartTotal();
+      var itemsHtml = cart.map(function (item) {
+        return '<div class="order-summary__item">' +
+          '<span class="order-summary__item-name">' + escapeHtml(item.name) + '</span>' +
+          '<span class="order-summary__item-qty">&times; ' + item.qty + '</span>' +
+          '<span class="order-summary__item-price">&pound;' + (item.price * item.qty).toFixed(2) + '</span>' +
+          '</div>';
+      }).join('');
+
+      var shipping = total >= 30 ? 'Free' : '£3.99';
+      var shippingVal = total >= 30 ? 0 : 3.99;
+      var grandTotal = total + shippingVal;
+
+      container.innerHTML =
+        '<div class="order-summary__items">' + itemsHtml + '</div>' +
+        '<div class="checkout-totals">' +
+          '<div class="checkout-totals__row"><span>Subtotal</span><span>&pound;' + total.toFixed(2) + '</span></div>' +
+          '<div class="checkout-totals__row"><span>Delivery</span><span>' + shipping + '</span></div>' +
+          '<div class="checkout-totals__row total"><span>Total</span><span class="amount">&pound;' + grandTotal.toFixed(2) + '</span></div>' +
+        '</div>';
+    }
+
+    /* Override placeOrder for the checkout page (no modal, uses page state) */
+    function placeOrder() {
+      var required = [
+        { id: 'cf-name' },
+        { id: 'cf-email' },
+        { id: 'cf-address1' },
+        { id: 'cf-city' },
+        { id: 'cf-postcode' }
+      ];
+
+      var valid = true;
+      required.forEach(function (field) {
+        var el = document.getElementById(field.id);
+        if (!el) return;
+        if (!el.value.trim()) {
+          el.classList.add('error');
+          valid = false;
+        } else {
+          el.classList.remove('error');
+        }
+      });
+
+      var emailEl = document.getElementById('cf-email');
+      if (emailEl && emailEl.value.trim()) {
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailEl.value.trim())) {
+          emailEl.classList.add('error');
+          valid = false;
+        }
+      }
+
+      if (!valid) {
+        var firstErr = document.querySelector('#checkout-form .error');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      clearCart();
+
+      var content = document.getElementById('checkout-page-content');
+      var success = document.getElementById('checkout-page-success');
+      if (content) content.style.display = 'none';
+      if (success) {
+        success.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* Remove error class on input */
+    document.querySelectorAll('.form-group input, .form-group textarea').forEach(function (el) {
+      el.addEventListener('input', function () { el.classList.remove('error'); });
+    });
+
+    /* Sticky nav shadow */
+    (function () {
+      var nav = document.getElementById('store-nav');
+      window.addEventListener('scroll', function () {
+        nav.classList.toggle('scrolled', window.scrollY > 20);
+      }, { passive: true });
+    })();
+
+    /* Wire Place Order button */
+    document.addEventListener('DOMContentLoaded', function () {
+      renderPageOrderSummary();
+
+      /* Re-render summary when cart changes (user opens drawer and modifies) */
+      var origRender = window.renderCart;
+      window.renderCart = function () {
+        if (typeof origRender === 'function') origRender();
+        renderPageOrderSummary();
+      };
+    });
+  </script>
+
+</body>
+</html>
