@@ -295,7 +295,7 @@
   <header class="store-nav" id="store-nav">
     <a href="store.html" class="store-nav__brand" aria-label="Asian Flavours Hub">
       <img
-        src="Food_logo.jpeg"
+        src="images/Food_logo.jpeg"
         alt="Asian Flavours Hub logo"
         class="store-nav__logo"
         width="60"
@@ -477,7 +477,7 @@
               </div>
 
               <div class="checkout-delivery-note">
-                Free delivery on orders over £30. Standard UK delivery 3–5 working days. Express delivery available at checkout (coming soon).
+                Delivery £3.80 for 1–3 items · £4.65 for 4+ items. Standard UK delivery 3–5 working days.
               </div>
             </div>
 
@@ -532,15 +532,18 @@
           '</div>';
       }).join('');
 
-      var shipping = total >= 30 ? 'Free' : '£3.99';
-      var shippingVal = total >= 30 ? 0 : 3.99;
-      var grandTotal = total + shippingVal;
+      var addressField = document.getElementById('cf-address1');
+      var hasAddress = addressField && addressField.value.trim().length > 0;
+      var totalItems = cart.reduce(function(sum, item) { return sum + item.qty; }, 0);
+      var deliveryVal = hasAddress ? (totalItems > 3 ? 4.65 : 3.80) : null;
+      var shippingDisplay = hasAddress ? ('&pound;' + deliveryVal.toFixed(2)) : 'Enter address';
+      var grandTotal = total + (deliveryVal || 0);
 
       container.innerHTML =
         '<div class="order-summary__items">' + itemsHtml + '</div>' +
         '<div class="checkout-totals">' +
           '<div class="checkout-totals__row"><span>Subtotal</span><span>&pound;' + total.toFixed(2) + '</span></div>' +
-          '<div class="checkout-totals__row"><span>Delivery</span><span>' + shipping + '</span></div>' +
+          '<div class="checkout-totals__row"><span>Delivery</span><span>' + shippingDisplay + '</span></div>' +
           '<div class="checkout-totals__row total"><span>Total</span><span class="amount">&pound;' + grandTotal.toFixed(2) + '</span></div>' +
         '</div>';
     }
@@ -609,6 +612,12 @@
     /* Wire Place Order button */
     document.addEventListener('DOMContentLoaded', function () {
       renderPageOrderSummary();
+
+      /* Re-render summary when address is entered */
+      var addressField = document.getElementById('cf-address1');
+      if (addressField) {
+        addressField.addEventListener('input', renderPageOrderSummary);
+      }
 
       /* Re-render summary when cart changes (user opens drawer and modifies) */
       var origRender = window.renderCart;

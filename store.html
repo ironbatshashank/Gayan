@@ -38,7 +38,15 @@
         <span class="cart-subtotal__label">Subtotal</span>
         <span class="cart-subtotal__value" id="cart-subtotal">£0.00</span>
       </div>
-      <p class="cart-note">Shipping calculated at checkout. Free delivery on orders over £30.</p>
+      <div class="cart-subtotal">
+        <span class="cart-subtotal__label">Shipping</span>
+        <span class="cart-subtotal__value" id="cart-shipping">£0.00</span>
+      </div>
+      <div class="cart-subtotal cart-total-row">
+        <span class="cart-subtotal__label">Total</span>
+        <span class="cart-subtotal__value cart-total-value" id="cart-total">£0.00</span>
+      </div>
+      <p class="cart-note">Delivery £3.80 (1–3 items) · £4.65 (4+ items). Enter address at checkout.</p>
       <button class="btn-checkout" id="btn-checkout" disabled>
         Proceed to Checkout →
       </button>
@@ -82,8 +90,17 @@
             </div>
             <div class="order-summary__divider"></div>
             <div class="order-summary__total">
-              <span class="order-summary__total-label">Total</span>
-              <span class="order-summary__total-value" id="order-summary-total">£0.00</span>
+              <span class="order-summary__total-label">Subtotal</span>
+              <span class="order-summary__total-value" id="order-summary-subtotal">£0.00</span>
+            </div>
+            <div class="order-summary__total" style="margin-top:0.4rem;">
+              <span class="order-summary__total-label">Shipping</span>
+              <span class="order-summary__total-value" id="order-summary-shipping">£0.00</span>
+            </div>
+            <div class="order-summary__divider"></div>
+            <div class="order-summary__total" style="margin-top:0.5rem;">
+              <span class="order-summary__total-label" style="font-size:1rem;font-weight:700;">Total</span>
+              <span class="order-summary__total-value" id="order-summary-total" style="font-size:1.1rem;color:var(--gold);">£0.00</span>
             </div>
           </div>
 
@@ -177,7 +194,7 @@
   <header class="store-nav" id="store-nav">
     <a href="store.html" class="store-nav__brand" aria-label="Asian Flavours Hub home">
       <img
-        src="Food_logo.jpeg"
+        src="images/Food_logo.jpeg"
         alt="Asian Flavours Hub logo"
         class="store-nav__logo"
         width="60"
@@ -240,44 +257,20 @@
 
         <div class="products__grid">
 
-          <!-- SAUCE 1: Dragon Fire Chilli Sauce -->
+          <!-- PRODUCT 1: Snake Bite -->
           <article class="product-card" data-product-id="1">
-            <div class="product-card__image sauce-1">
-              <div class="product-card__image-overlay"></div>
-              <span class="product-card__badge">🔥 Hot</span>
+            <div class="product-card__image">
+              <img src="images/products/42889473-D1CD-4ADE-96AB-C0E936ED1567.png" alt="Snake Bite Pineapple Hot Sauce" class="product-card__img" />
+              <span class="product-card__badge">🔥 Heat: 2</span>
             </div>
             <div class="product-card__body">
-              <h3 class="product-card__name">Dragon Fire Chilli Sauce</h3>
-              <div class="product-card__price">£6.99</div>
-              <p class="product-card__desc">A scorching blend of red chillis and garlic with a smoky finish. For the truly brave.</p>
-              <div class="qty-selector">
-                <span class="qty-selector__label">Qty:</span>
-                <div class="qty-controls">
-                  <button class="qty-btn" onclick="changeLocalQty(this, -1)" aria-label="Decrease quantity">−</button>
-                  <span class="qty-value">1</span>
-                  <button class="qty-btn" onclick="changeLocalQty(this, 1)" aria-label="Increase quantity">+</button>
-                </div>
-              </div>
-              <button
-                class="btn-add-cart"
-                onclick="handleAddToCart(this, '1', 'Dragon Fire Chilli Sauce', 6.99, 'sauce-1')"
-                aria-label="Add Dragon Fire Chilli Sauce to cart"
-              >
-                + Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <!-- SAUCE 2: Golden Ginger Soy Glaze -->
-          <article class="product-card" data-product-id="2">
-            <div class="product-card__image sauce-2">
-              <div class="product-card__image-overlay"></div>
-              <span class="product-card__badge">⭐ Popular</span>
-            </div>
-            <div class="product-card__body">
-              <h3 class="product-card__name">Golden Ginger Soy Glaze</h3>
+              <h3 class="product-card__name">Snake Bite</h3>
               <div class="product-card__price">£5.99</div>
-              <p class="product-card__desc">Sweet soy meets fresh ginger for a versatile Asian glaze. Perfect for marinades and stir-fries.</p>
+              <div class="product-card__desc">
+                <p>Elevate your meals with our delicious pineapple-based hot sauce made with fiery scotch bonnet peppers. This unique blend offers a heat level of 2, striking the perfect balance between heat and flavour.</p>
+                <p><strong>All-Natural Ingredients</strong><br>Crafted without any MSG, artificial flavours, or colours. Gluten-free, so everyone can enjoy it!</p>
+                <p><strong>Versatile Flavour Enhancer</strong><br>Perfect for pizza, pasta, biriyani, fried rice, BBQ, salads, burgers, or noodles.</p>
+              </div>
               <div class="qty-selector">
                 <span class="qty-selector__label">Qty:</span>
                 <div class="qty-controls">
@@ -288,24 +281,60 @@
               </div>
               <button
                 class="btn-add-cart"
-                onclick="handleAddToCart(this, '2', 'Golden Ginger Soy Glaze', 5.99, 'sauce-2')"
-                aria-label="Add Golden Ginger Soy Glaze to cart"
+                onclick="handleAddToCart(this, '1', 'Snake Bite', 5.99, 'images/products/42889473-D1CD-4ADE-96AB-C0E936ED1567.png')"
+                aria-label="Add Snake Bite to cart"
               >
                 + Add to Cart
               </button>
             </div>
           </article>
 
-          <!-- SAUCE 3: Sesame Hoisin Delight -->
+          <!-- PRODUCT 2: Scorpion Sting -->
+          <article class="product-card" data-product-id="2">
+            <div class="product-card__image">
+              <img src="images/products/70473BD4-672D-4756-945B-7D001509F067.png" alt="Scorpion Sting Mango Hot Sauce" class="product-card__img" />
+              <span class="product-card__badge">🥭 Heat: 1</span>
+            </div>
+            <div class="product-card__body">
+              <h3 class="product-card__name">Scorpion Sting</h3>
+              <div class="product-card__price">£5.99</div>
+              <div class="product-card__desc">
+                <p>Experience the delightful blend of juicy fresh mangoes and fiery scotch bonnet peppers. Boasting a heat level of just 1 — perfect for enhancing your favourite dishes without overwhelming your palate.</p>
+                <p><strong>Natural Ingredients for Authentic Taste</strong><br>No artificial flavours, colours, MSG, or gluten. Pure and delicious in every drop.</p>
+                <p><strong>Versatile Uses in Your Kitchen</strong><br>Perfect for pizza, salads, dosa, and roti — complements an array of cuisines.</p>
+              </div>
+              <div class="qty-selector">
+                <span class="qty-selector__label">Qty:</span>
+                <div class="qty-controls">
+                  <button class="qty-btn" onclick="changeLocalQty(this, -1)" aria-label="Decrease quantity">−</button>
+                  <span class="qty-value">1</span>
+                  <button class="qty-btn" onclick="changeLocalQty(this, 1)" aria-label="Increase quantity">+</button>
+                </div>
+              </div>
+              <button
+                class="btn-add-cart"
+                onclick="handleAddToCart(this, '2', 'Scorpion Sting', 5.99, 'images/products/70473BD4-672D-4756-945B-7D001509F067.png')"
+                aria-label="Add Scorpion Sting to cart"
+              >
+                + Add to Cart
+              </button>
+            </div>
+          </article>
+
+          <!-- PRODUCT 3: Dragon's Fury -->
           <article class="product-card" data-product-id="3">
-            <div class="product-card__image sauce-3">
-              <div class="product-card__image-overlay"></div>
-              <span class="product-card__badge">🥢 Classic</span>
+            <div class="product-card__image">
+              <img src="images/products/78B29601-964C-4B3A-9E4A-647708FF6948.png" alt="Dragon's Fury Passion Fruit Hot Sauce" class="product-card__img" />
+              <span class="product-card__badge">🔥 Heat: 3</span>
             </div>
             <div class="product-card__body">
-              <h3 class="product-card__name">Sesame Hoisin Delight</h3>
-              <div class="product-card__price">£6.49</div>
-              <p class="product-card__desc">Rich hoisin layered with toasted sesame for depth and sweetness. A timeless combination.</p>
+              <h3 class="product-card__name">Dragon's Fury</h3>
+              <div class="product-card__price">£5.99</div>
+              <div class="product-card__desc">
+                <p>Elevate your meals with our passion fruit-based hot sauce made with fiery scotch bonnet peppers. A heat level of 3 — the perfect balance between heat and tropical flavour.</p>
+                <p><strong>All-Natural Ingredients</strong><br>No MSG, artificial flavours, or colours. Gluten-free for everyone to enjoy.</p>
+                <p><strong>Versatile Flavour Enhancer</strong><br>Perfect for short eats, pizza, fried rice, kottu, fried chicken, and fish.</p>
+              </div>
               <div class="qty-selector">
                 <span class="qty-selector__label">Qty:</span>
                 <div class="qty-controls">
@@ -316,24 +345,28 @@
               </div>
               <button
                 class="btn-add-cart"
-                onclick="handleAddToCart(this, '3', 'Sesame Hoisin Delight', 6.49, 'sauce-3')"
-                aria-label="Add Sesame Hoisin Delight to cart"
+                onclick="handleAddToCart(this, '3', 'Dragon\'s Fury', 5.99, 'images/products/78B29601-964C-4B3A-9E4A-647708FF6948.png')"
+                aria-label="Add Dragon's Fury to cart"
               >
                 + Add to Cart
               </button>
             </div>
           </article>
 
-          <!-- SAUCE 4: Szechuan Numbing Oil -->
+          <!-- PRODUCT 4: Nak Muay Thai Sweet Chili -->
           <article class="product-card" data-product-id="4">
-            <div class="product-card__image sauce-4">
-              <div class="product-card__image-overlay"></div>
-              <span class="product-card__badge">🌶️ Intense</span>
+            <div class="product-card__image">
+              <img src="images/products/A35C227B-CA42-4798-A419-72BAE7725312.jpeg" alt="Nak Muay Thai Sweet Chili Sauce" class="product-card__img" />
+              <span class="product-card__badge">🌶️ Thai</span>
             </div>
             <div class="product-card__body">
-              <h3 class="product-card__name">Szechuan Numbing Oil</h3>
-              <div class="product-card__price">£7.49</div>
-              <p class="product-card__desc">Authentic Szechuan peppercorn oil that tingles and excites every bite. A sensory experience.</p>
+              <h3 class="product-card__name">Nak Muay Thai Sweet Chili</h3>
+              <div class="product-card__price">£5.99</div>
+              <div class="product-card__desc">
+                <p>Step into the heat of Thailand. Our Nak Muay Thai Sweet Chili Sauce blends fiery red chilies, bold garlic, and a satisfying sweetness — delivering a classic Thai-style taste that's sweet, garlicky, and mildly spicy.</p>
+                <p><strong>Simple Ingredients, Bold Flavour</strong><br>Crafted without MSG and gluten, with carefully selected ingredients for rich, consistent taste every time.</p>
+                <p><strong>A Versatile Fighter in Your Kitchen</strong><br>Perfect for dipping crispy snacks, drizzling over grilled meats, or marinating tofu and seafood.</p>
+              </div>
               <div class="qty-selector">
                 <span class="qty-selector__label">Qty:</span>
                 <div class="qty-controls">
@@ -344,36 +377,8 @@
               </div>
               <button
                 class="btn-add-cart"
-                onclick="handleAddToCart(this, '4', 'Szechuan Numbing Oil', 7.49, 'sauce-4')"
-                aria-label="Add Szechuan Numbing Oil to cart"
-              >
-                + Add to Cart
-              </button>
-            </div>
-          </article>
-
-          <!-- SAUCE 5: Lemongrass & Coconut Dip -->
-          <article class="product-card" data-product-id="5">
-            <div class="product-card__image sauce-5">
-              <div class="product-card__image-overlay"></div>
-              <span class="product-card__badge">🌿 Fresh</span>
-            </div>
-            <div class="product-card__body">
-              <h3 class="product-card__name">Lemongrass &amp; Coconut Dip</h3>
-              <div class="product-card__price">£5.49</div>
-              <p class="product-card__desc">A fragrant, creamy dip with tropical lemongrass and coconut notes. Light, fresh and irresistible.</p>
-              <div class="qty-selector">
-                <span class="qty-selector__label">Qty:</span>
-                <div class="qty-controls">
-                  <button class="qty-btn" onclick="changeLocalQty(this, -1)" aria-label="Decrease quantity">−</button>
-                  <span class="qty-value">1</span>
-                  <button class="qty-btn" onclick="changeLocalQty(this, 1)" aria-label="Increase quantity">+</button>
-                </div>
-              </div>
-              <button
-                class="btn-add-cart"
-                onclick="handleAddToCart(this, '5', 'Lemongrass &amp; Coconut Dip', 5.49, 'sauce-5')"
-                aria-label="Add Lemongrass and Coconut Dip to cart"
+                onclick="handleAddToCart(this, '4', 'Nak Muay Thai Sweet Chili', 5.99, 'images/products/A35C227B-CA42-4798-A419-72BAE7725312.jpeg')"
+                aria-label="Add Nak Muay Thai Sweet Chili to cart"
               >
                 + Add to Cart
               </button>

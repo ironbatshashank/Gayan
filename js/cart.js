@@ -101,6 +101,18 @@ function updateQty(id, delta) {
 }
 
 /**
+ * Calculate delivery charge based on whether an address has been entered
+ * and the total number of items in the cart.
+ * Returns null if no address is entered yet.
+ * @returns {number|null}
+ */
+function getDeliveryCharge() {
+  const addressField = document.getElementById('cf-address1');
+  if (!addressField || !addressField.value.trim()) return null;
+  return getCartCount() > 3 ? 4.65 : 3.80;
+}
+
+/**
  * Calculate and return total price of all cart items.
  * @returns {number}
  */
@@ -164,6 +176,9 @@ function renderCart() {
 
   if (!body) return;
 
+  const shippingEl = document.getElementById('cart-shipping');
+  const totalEl = document.getElementById('cart-total');
+
   if (cart.length === 0) {
     body.innerHTML = `
       <div class="cart-empty">
@@ -172,15 +187,21 @@ function renderCart() {
       </div>
     `;
     if (subtotalEl) subtotalEl.textContent = '£0.00';
+    if (shippingEl) shippingEl.textContent = '£0.00';
+    if (totalEl) totalEl.textContent = '£0.00';
     if (checkoutBtn) checkoutBtn.disabled = true;
     return;
   }
 
   if (checkoutBtn) checkoutBtn.disabled = false;
 
-  body.innerHTML = cart.map(item => `
+  body.innerHTML = cart.map(item => {
+    const colorHtml = item.color && item.color.includes('.')
+      ? `<img src="${escapeHtml(item.color)}" alt="" class="cart-item__color cart-item__color--img" />`
+      : `<div class="cart-item__color ${escapeHtml(item.color || '')}"></div>`;
+    return `
     <div class="cart-item" data-id="${item.id}">
-      <div class="cart-item__color ${item.color}"></div>
+      ${colorHtml}
       <div class="cart-item__details">
         <div class="cart-item__name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>
         <div class="cart-item__price">
@@ -195,10 +216,15 @@ function renderCart() {
       </div>
       <button class="cart-item__remove" onclick="removeFromCart('${item.id}')" aria-label="Remove item" title="Remove">✕</button>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   const total = getCartTotal();
   if (subtotalEl) subtotalEl.textContent = `£${total.toFixed(2)}`;
+
+  const delivery = getDeliveryCharge();
+  if (shippingEl) shippingEl.textContent = delivery !== null ? `£${delivery.toFixed(2)}` : 'At checkout';
+  if (totalEl) totalEl.textContent = `£${(total + (delivery || 0)).toFixed(2)}`;
 
   renderOrderSummary(cart, total);
 }
@@ -210,6 +236,8 @@ function renderCart() {
  */
 function renderOrderSummary(cart, total) {
   const summaryItems = document.getElementById('order-summary-items');
+  const summarySubtotal = document.getElementById('order-summary-subtotal');
+  const summaryShipping = document.getElementById('order-summary-shipping');
   const summaryTotal = document.getElementById('order-summary-total');
 
   if (!summaryItems) return;
@@ -222,7 +250,10 @@ function renderOrderSummary(cart, total) {
     </div>
   `).join('');
 
-  if (summaryTotal) summaryTotal.textContent = `£${total.toFixed(2)}`;
+  const delivery = getDeliveryCharge();
+  if (summarySubtotal) summarySubtotal.textContent = `£${total.toFixed(2)}`;
+  if (summaryShipping) summaryShipping.textContent = delivery !== null ? `£${delivery.toFixed(2)}` : 'Enter address';
+  if (summaryTotal) summaryTotal.textContent = `£${(total + (delivery || 0)).toFixed(2)}`;
 }
 
 /* ============================================================
@@ -405,6 +436,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.form-group input, .form-group textarea').forEach(el => {
     el.addEventListener('input', () => el.classList.remove('error'));
   });
+
+  const addressField = document.getElementById('cf-address1');
+  if (addressField) {
+    addressField.addEventListener('input', () => {
+      const cart = getCart();
+      renderOrderSummary(cart, getCartTotal());
+      renderCart();
+    });
+  }
 
   const navbar = document.querySelector('.store-nav') || document.querySelector('.navbar');
   if (navbar) {
