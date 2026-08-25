@@ -285,18 +285,9 @@ function openCheckout() {
   const cart = getCart();
   if (cart.length === 0) return;
 
-  renderOrderSummary(cart, getCartTotal());
-
-  const modal = document.getElementById('checkout-modal');
-  if (modal) {
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-
-    const successSection = document.getElementById('order-success');
-    const formSection = document.getElementById('checkout-form-section');
-    if (successSection) successSection.classList.remove('active');
-    if (formSection) formSection.style.display = '';
-  }
+  /* Checkout now happens on its own page (checkout.html), which handles
+     the Stripe Payment Link redirect. */
+  window.location.href = 'checkout.html';
 }
 
 function closeCheckout() {

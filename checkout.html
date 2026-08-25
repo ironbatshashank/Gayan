@@ -293,7 +293,7 @@
        STORE NAVBAR
        ============================================================ -->
   <header class="store-nav" id="store-nav">
-    <a href="store.html" class="store-nav__brand" aria-label="Asian Flavours Hub">
+    <a href="index.html" class="store-nav__brand" aria-label="Asian Flavours Hub">
       <img
         src="images/Food_logo.jpeg"
         alt="Asian Flavours Hub logo"
@@ -303,12 +303,12 @@
       />
       <div class="store-nav__name">
         Asian Flavours Hub
-        <small>by FiscalUK</small>
+        <small></small>
       </div>
     </a>
 
     <div class="store-nav__right">
-      <a href="store.html" class="back-link" aria-label="Continue shopping">
+      <a href="index.html" class="back-link" aria-label="Continue shopping">
         ← <span>Continue Shopping</span>
       </a>
       <button class="cart-btn" data-open-cart aria-label="View cart" aria-haspopup="dialog">
@@ -357,17 +357,17 @@
           <div class="checkout-success__icon">✓</div>
           <h1 class="checkout-success__title">Order Placed!</h1>
           <p class="checkout-success__msg">
-            Thank you! Your order has been received. We'll be in touch shortly at the email address you provided to confirm your order and arrange payment.
+            Thank you! Your payment was successful and your order has been received. We'll send a confirmation to the email address you provided.
           </p>
+          <p class="checkout-success__msg" id="checkout-success-ref" style="margin-top: -1.5rem; font-size: 0.85rem;"></p>
           <div class="checkout-success__actions">
-            <a href="store.html" class="btn-gold">Continue Shopping</a>
-            <a href="index.html" class="btn-ghost">Return to FiscalUK</a>
+            <a href="index.html" class="btn-gold">Continue Shopping</a>
           </div>
         </div>
 
         <!-- Checkout Form State -->
         <div id="checkout-page-content">
-          <a href="store.html" class="checkout-back-link">← Back to Store</a>
+          <a href="index.html" class="checkout-back-link">← Back to Store</a>
 
           <div class="checkout-page__header">
             <div class="checkout-page__eyebrow">Asian Flavours Hub</div>
@@ -453,12 +453,12 @@
                   </div>
 
                   <div class="payment-note">
-                    <strong>Payment Gateway Coming Soon</strong>
-                    We'll contact you via email to arrange payment once your order is confirmed. Your details are safe with us.
+                    <strong>Secure Payment via Stripe</strong>
+                    Clicking below takes you to Stripe's secure payment page to complete your purchase. Please confirm the sauces and quantities shown in your order summary match your cart before paying.
                   </div>
 
                   <button type="button" class="btn-place-order" id="btn-place-order">
-                    Place Order
+                    Continue to Payment →
                   </button>
 
                 </form>
@@ -471,7 +471,7 @@
                 <div class="checkout-summary-box__header">Order Summary</div>
                 <div class="checkout-summary-box__body" id="page-order-summary">
                   <div class="checkout-summary-empty">
-                    Your cart is empty. <a href="store.html">Browse our sauces →</a>
+                    Your cart is empty. <a href="index.html">Browse our sauces →</a>
                   </div>
                 </div>
               </div>
@@ -495,12 +495,12 @@
   <footer class="store-footer">
     <div class="store-footer__inner">
       <div class="store-footer__brand">Asian Flavours Hub</div>
-      <p class="store-footer__copy">&copy; 2025 Asian Flavours Hub by FiscalUK. All rights reserved.</p>
-      <a href="index.html" class="store-footer__link">← Return to FiscalUK Accounting</a>
+      <p class="store-footer__copy">&copy; 2025 Asian Flavours Hub. All rights reserved.</p>
     </div>
   </footer>
 
   <script src="js/cart.js"></script>
+  <script src="js/stripe-config.js"></script>
 
   <script>
     /**
@@ -513,7 +513,7 @@
       if (!container) return;
 
       if (cart.length === 0) {
-        container.innerHTML = '<div class="checkout-summary-empty">Your cart is empty. <a href="store.html">Browse our sauces →</a></div>';
+        container.innerHTML = '<div class="checkout-summary-empty">Your cart is empty. <a href="index.html">Browse our sauces →</a></div>';
         var btn = document.getElementById('btn-place-order');
         if (btn) {
           btn.disabled = true;
@@ -585,7 +585,73 @@
         return;
       }
 
+      if (getCart().length === 0) return;
+
+      var paymentLink = window.STRIPE_CONFIG && STRIPE_CONFIG.PAYMENT_LINK_URL;
+      if (!paymentLink || paymentLink.indexOf('REPLACE_WITH_YOUR_PAYMENT_LINK') !== -1) {
+        alert('Payments are not configured yet. Please set STRIPE_CONFIG.PAYMENT_LINK_URL in js/stripe-config.js (see the setup instructions in that file).');
+        return;
+      }
+
+      /* Build an order reference and stash the order details locally so we
+         can show a confirmation once Stripe redirects the customer back. */
+      var randomSuffix = Math.random().toString(36).slice(2, 8).toUpperCase();
+      var orderRef = 'AFH-' + Date.now().toString(36).toUpperCase() + '-' + randomSuffix;
+      var pendingOrder = {
+        ref: orderRef,
+        name: document.getElementById('cf-name').value.trim(),
+        email: document.getElementById('cf-email').value.trim(),
+        phone: document.getElementById('cf-phone').value.trim(),
+        address1: document.getElementById('cf-address1').value.trim(),
+        address2: document.getElementById('cf-address2').value.trim(),
+        city: document.getElementById('cf-city').value.trim(),
+        postcode: document.getElementById('cf-postcode').value.trim(),
+        country: document.getElementById('cf-country').value,
+        notes: document.getElementById('cf-notes').value.trim(),
+        cart: getCart(),
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        localStorage.setItem('afh_pending_order', JSON.stringify(pendingOrder));
+      } catch (e) {
+        console.error('Could not save pending order:', e);
+      }
+
+      var params = new URLSearchParams();
+      params.set('client_reference_id', orderRef);
+      if (pendingOrder.email) params.set('prefilled_email', pendingOrder.email);
+
+      var separator = paymentLink.indexOf('?') === -1 ? '?' : '&';
+      window.location.href = paymentLink + separator + params.toString();
+    }
+
+    /**
+     * If Stripe has redirected the customer back here after a successful
+     * payment (see STRIPE_CONFIG setup instructions for the after-payment
+     * redirect URL), show the success state and clear the cart.
+     */
+    function handleStripeReturn() {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('order') !== 'success') return;
+
+      var pendingRaw = null;
+      try {
+        pendingRaw = localStorage.getItem('afh_pending_order');
+      } catch (e) { /* ignore storage errors */ }
+
+      if (pendingRaw) {
+        try {
+          var pending = JSON.parse(pendingRaw);
+          var refEl = document.getElementById('checkout-success-ref');
+          if (refEl && pending.ref) refEl.textContent = 'Order reference: ' + pending.ref;
+        } catch (e) { /* ignore parse errors */ }
+      }
+
       clearCart();
+      try {
+        localStorage.removeItem('afh_pending_order');
+      } catch (e) { /* ignore storage errors */ }
 
       var content = document.getElementById('checkout-page-content');
       var success = document.getElementById('checkout-page-success');
@@ -593,6 +659,11 @@
       if (success) {
         success.classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      /* Clean the query string so a refresh doesn't repeat this. */
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
 
@@ -611,6 +682,7 @@
 
     /* Wire Place Order button */
     document.addEventListener('DOMContentLoaded', function () {
+      handleStripeReturn();
       renderPageOrderSummary();
 
       /* Re-render summary when address is entered */
